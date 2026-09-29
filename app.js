@@ -86,7 +86,6 @@ let role = parameters.get('role') || readPreference('aw3-role', 'creator');
 let theme = parameters.get('theme') || readPreference('aw3-theme', 'dark');
 if (!Object.hasOwn(content, role)) role = 'creator';
 if (!['dark', 'light'].includes(theme)) theme = 'dark';
-let step = 0;
 
 function getAssets() {
   const raw = window.AW3_ASSETS[`${theme}-${role}`];
@@ -108,17 +107,6 @@ function getAssets() {
     opportunities: raw[`imgIcon${featureOffset}`], payments: raw[`imgIcon${featureOffset + 1}`],
     reputation: raw[`imgIcon${featureOffset + 2}`], portfolio: raw[`imgIcon${featureOffset + 3}`], fair: raw[`imgIcon${featureOffset + 4}`],
   };
-}
-
-function renderStep(direction = 1) {
-  const data = content[role].steps[step];
-  document.querySelector('#step-label').textContent = `${String(step + 1).padStart(2, '0')} / ${data[0]}`;
-  document.querySelector('#step-title').textContent = data[1];
-  document.querySelector('#step-description').textContent = data[2];
-  document.querySelector('#step-number').textContent = step + 1;
-  document.querySelector('.slide').setAttribute('aria-label', `Step ${step + 1} of 4: ${data[1]}`);
-  document.querySelector('#how-step-image').src = `assets/how-${data[3]}.png`;
-  window.howCarousel.update(role, step, direction);
 }
 
 function render() {
@@ -145,13 +133,13 @@ function render() {
     copy.append(heading, body); article.append(image, copy); return article;
   });
   document.querySelector('#features-grid').replaceChildren(...cards);
-  renderStep();
+  window.howScroll.render(role, data.steps);
   applyDestinationLinks();
 }
 
 document.querySelectorAll('[data-role]').forEach(button => {
   button.addEventListener('click', () => {
-    role = button.dataset.role; step = 0; savePreference('aw3-role', role); render();
+    role = button.dataset.role; savePreference('aw3-role', role); render();
   });
 });
 document.querySelectorAll('[data-theme-choice]').forEach(button => {
@@ -160,14 +148,6 @@ document.querySelectorAll('[data-theme-choice]').forEach(button => {
     savePreference('aw3-theme', theme);
     render();
   });
-});
-function changeStep(direction) { step = (step + direction + 4) % 4; renderStep(direction); }
-document.querySelector('.previous').addEventListener('click', () => changeStep(-1));
-document.querySelector('.next').addEventListener('click', () => changeStep(1));
-document.querySelector('.carousel').addEventListener('keydown', event => {
-  if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-    event.preventDefault(); changeStep(event.key === 'ArrowRight' ? 1 : -1);
-  }
 });
 document.querySelectorAll('.faq-list details').forEach(detail => {
   detail.addEventListener('toggle', () => {
@@ -212,5 +192,4 @@ dialog.addEventListener('click', event => { if (event.target === dialog) { const
 Object.values(content).flatMap(data => data.steps).forEach(stepData => {
   const image = new Image(); image.src = `assets/how-${stepData[3]}.png`;
 });
-window.howCarousel.init(changeStep);
 render();

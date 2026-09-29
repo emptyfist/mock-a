@@ -1,68 +1,68 @@
 (() => {
-  const carousel = document.querySelector('#how-it-works .carousel');
-  const slide = carousel.querySelector('.slide');
-  const pause = carousel.querySelector('.how-pause');
-  const fill = carousel.querySelector('.how-progress-fill');
-  const segments = [...carousel.querySelectorAll('.how-step-button')];
-  let activeStep = 0;
+  const section = document.querySelector('#how-it-works');
+  const pin = section.querySelector('.how-pin');
+  const viewport = section.querySelector('.how-viewport');
+  const track = section.querySelector('.how-track');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let progress, transition, identity, advance, pointer;
-  let paused = false, hovered = false, focused = false, visible = false;
-  function syncPlayback() {
-    if (!progress) return;
-    const running = !paused && !hovered && !focused && visible && !document.hidden && !reduced.matches;
-    if (running) progress.play(); else progress.pause();
-    slide.setAttribute('aria-live', running ? 'off' : 'polite');
+  let currentRole, frame = 0, distance = 1, pinTop = 0;
+  const clamp = value => Math.max(0, Math.min(1, value));
+  function paint() {
+    frame = 0;
+    if (section.dataset.layout !== 'pinned') { track.style.transform = ''; return; }
+    const progress = clamp((pinTop - section.getBoundingClientRect().top) / distance);
+    const position = progress * 3;
+    const step = Math.min(2, Math.floor(position));
+    // Brief resting portions keep each card readable between horizontal swipes.
+    const local = clamp((position - step - .15) / .7);
+    const eased = local * local * (3 - 2 * local);
+    track.style.transform = `translate3d(${-((step + eased) * (viewport.clientWidth + 24))}px,0,0)`;
   }
-  window.howCarousel = {
-    init(callback) { advance = callback; },
-    update(role, step, direction = 1) {
-      const nextIdentity = `${role}:${step}`;
-      if (identity === nextIdentity) return;
-      const wasRendered = identity !== undefined;
-      identity = nextIdentity;
-      if (progress) { progress.onfinish = null; progress.cancel(); }
-      activeStep = step;
-      segments.forEach((button, i) => {
-        if (i === step) button.setAttribute('aria-current', 'step');
-        else button.removeAttribute('aria-current');
-      });
-      segments[step].querySelector('.how-segment-track').append(fill);
-      transition?.cancel();
-      if (wasRendered && !reduced.matches) {
-        transition = slide.animate([
-          { opacity: .35, transform: `translateX(${direction < 0 ? -24 : 24}px)` },
-          { opacity: 1, transform: 'translateX(0)' },
-        ], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)' });
+  function requestPaint() { if (!frame) frame = requestAnimationFrame(paint); }
+  function measure() {
+    const available = window.innerHeight - 112;
+    // Short screens and reduced-motion users get all four cards in normal document flow.
+    section.dataset.layout = reduced.matches ? 'stacked' : 'pinned';
+    const height = pin.getBoundingClientRect().height;
+    if (reduced.matches || height > available) {
+      section.dataset.layout = 'stacked';
+      section.style.height = '';
+      pin.style.top = '';
+    } else {
+      pinTop = Math.max(96, (window.innerHeight - height) / 2);
+      distance = Math.max(480, window.innerHeight * .8) * 3;
+      section.style.height = `${height + distance}px`;
+      pin.style.top = `${pinTop}px`;
+    }
+    requestPaint();
+  }
+  window.howScroll = {
+    render(role, steps) {
+      if (role !== currentRole) {
+        currentRole = role;
+        track.replaceChildren(...steps.map(([label, title, description, asset], i) => {
+          const card = document.createElement('article');
+          card.className = 'slide';
+          const headingId = `how-card-${i + 1}`;
+          card.setAttribute('aria-labelledby', headingId);
+          card.innerHTML = `<div class="step-art" aria-hidden="true"><img src="assets/how-${asset}.png" width="731" height="193" alt="" draggable="false"></div><div class="step-copy"><p class="eyebrow">${String(i + 1).padStart(2, '0')} / ${label}</p><h3 id="${headingId}">${title}</h3><p>${description}</p></div>`;
+          return card;
+        }));
       }
-      progress = fill.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}], {duration:5000,easing:'linear',fill:'forwards'});
-      progress.onfinish = () => advance(1);
-      syncPlayback();
+      requestAnimationFrame(measure);
     },
   };
-  segments.forEach((button, i) => button.addEventListener('click', () => {
-    if (i !== activeStep) advance(i - activeStep);
-  }));
-  pause.addEventListener('click', () => {
-    paused = !paused;
-    pause.setAttribute('aria-label', paused ? 'Play automatic steps' : 'Pause automatic steps');
-    pause.setAttribute('aria-pressed', String(paused));
-    syncPlayback();
-  });
-  carousel.addEventListener('pointerenter', e => { if(e.pointerType === 'mouse') { hovered = true; syncPlayback(); } });
-  carousel.addEventListener('pointerleave', () => { hovered = false; syncPlayback(); });
-  carousel.addEventListener('focusin', () => { focused = true; syncPlayback(); });
-  carousel.addEventListener('focusout', e => { focused = carousel.contains(e.relatedTarget); syncPlayback(); });
-  slide.addEventListener('pointerdown', e => { pointer = {x:e.clientX,y:e.clientY}; });
-  slide.addEventListener('pointerup', e => {
-    if (pointer) {
-      const dx=e.clientX-pointer.x, dy=e.clientY-pointer.y;
-      if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) advance(dx<0?1:-1);
+  window.addEventListener('scroll', requestPaint, { passive: true });
+  window.addEventListener('resize', measure, { passive: true });
+  reduced.addEventListener('change', measure);
+  // Content and font reflows can change the vertical centering point.
+  let measuredWidth = 0, measuredHeight = 0;
+  new ResizeObserver(() => {
+    const width = viewport.clientWidth;
+    const cardHeight = track.firstElementChild?.offsetHeight || 0;
+    if (width !== measuredWidth || cardHeight !== measuredHeight) {
+      measuredWidth = width; measuredHeight = cardHeight;
+      requestAnimationFrame(measure);
     }
-    pointer=null;
-  });
-  slide.addEventListener('pointercancel', () => { pointer=null; });
-  document.addEventListener('visibilitychange',syncPlayback);
-  reduced.addEventListener('change', () => { if(reduced.matches) transition?.cancel(); syncPlayback(); });
-  new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;syncPlayback();},{threshold:.35}).observe(slide);
+  }).observe(viewport);
+  document.fonts.ready.then(measure);
 })();
