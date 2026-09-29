@@ -7,9 +7,13 @@
   <meta name="theme-color" content="#070d08">
   <title>AllWeb3 — The future of marketing is on-chain</title>
   <link rel="icon" href="assets/5b06e.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
   <script src="assets.js" defer></script>
+  <script src="hero.js" defer></script>
+  <script src="how.js?v=2" defer></script>
   <script src="app.js" defer></script>
+  <link rel="stylesheet" href="hero.css?v=1">
+  <link rel="stylesheet" href="how.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -24,18 +28,32 @@
   </header>
   <div class="page">
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <div class="role-switch" role="group" aria-label="Choose your role">
-            <button type="button" data-role="creator" aria-pressed="true"><img data-asset="creatorIcon" src="assets/9b8eb.svg" alt="">I'm a creator</button>
-            <button type="button" data-role="brand" aria-pressed="false"><img data-asset="brandIcon" src="assets/ec506.svg" alt="">I'm a Brand</button>
-          </div>
-          <h1 id="hero-title"><span data-copy="heroTitle">Get rewarded for the</span><span class="gradient" data-copy="heroAccent">attention you create</span></h1>
-          <p class="hero-description" data-copy="heroDescription">AllWeb3 is an onchain marketing platform that lets anyone earn by sharing campaigns.</p>
-          <div class="button-row hero-buttons"><a class="button primary role-cta" href="#" data-destination="role"><img data-asset="ctaIcon" src="assets/7d468.svg" alt=""><span data-copy="cta">Start Earning</span><img data-asset="ctaArrow" src="assets/c43cd.svg" alt=""></a><a class="button secondary" href="#" data-destination="docs"><img data-asset="docIcon" src="assets/22641.svg" alt="">Read the docs</a></div>
-          <dl class="stats"><div><dt>Creators</dt><dd>1K+</dd></div><div><dt>Projects</dt><dd>1K+</dd></div><div><dt>Successful Campaigns</dt><dd>1K+</dd></div></dl>
+      <section class="hero hero-swipe" aria-labelledby="hero-title">
+        <div class="role-switch" role="group" aria-label="Choose your role">
+          <button type="button" data-role="creator" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg>I'm a Creator</button>
+          <button type="button" data-role="brand" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M8 7v14M16 7v14"/></svg>I'm a Brand</button>
         </div>
-        <div class="hero-art"><img id="hero-image" src="assets/7d650.png" alt="Green glass panels showing Create, Share, Earn and campaign rewards" fetchpriority="high"></div>
+        <div class="hero-intro">
+          <h1 id="hero-title"><span data-hero-copy="title">Your creativity deserves</span><span class="gradient" data-hero-copy="accent">more than impressions.</span></h1>
+          <p class="hero-description" data-hero-copy="description">Find Web3 campaigns, create content, and turn verified contributions into rewards.</p>
+        </div>
+        <div class="hero-feature">
+          <div class="hero-feature-copy">
+            <p class="hero-kicker" data-hero-copy="kicker">Why AllWeb3 for Creators</p>
+            <h2><b data-hero-copy="heading">Your work has value.</b><span data-hero-copy="highlight">Make it count.</span></h2>
+            <p class="hero-feature-description" data-hero-copy="body">AllWeb3 connects your content to campaigns with clear tasks, visible performance, and rewards tied to what you deliver.</p>
+            <a class="button primary" href="#" data-destination="role"><span data-hero-copy="cta">Explore Campaigns</span><span aria-hidden="true">→</span></a>
+          </div>
+          <div class="hero-visual" role="region" aria-roledescription="carousel" aria-label="AllWeb3 campaign steps">
+            <div class="hero-stage" tabindex="0" aria-label="Campaign cards. Use left and right arrow keys to change the card."></div>
+            <div class="hero-controls" role="group" aria-label="Card controls">
+              <button class="hero-dot" type="button" aria-label="Show Discover card" aria-pressed="true"></button>
+              <button class="hero-dot" type="button" aria-label="Show Create card" aria-pressed="false"></button>
+              <button class="hero-dot" type="button" aria-label="Show Earn card" aria-pressed="false"></button>
+              <button class="hero-pause" type="button" aria-label="Pause card animation" aria-pressed="false">Ⅱ</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="banner rewards-banner" aria-labelledby="rewards-title">
@@ -47,22 +65,28 @@
         <div class="section-heading"><p class="eyebrow">HOW IT WORKS</p><h2 id="how-title"><span data-copy="howTitle">Start earning</span><br>in <span class="gradient">four steps</span></h2><a class="button primary role-cta" href="#" data-destination="role"><img data-asset="ctaIcon" src="assets/7d468.svg" alt=""><span data-copy="cta">Start Earning</span><img data-asset="ctaArrow" src="assets/c43cd.svg" alt=""></a></div>
         <div class="carousel" role="region" aria-roledescription="carousel" aria-label="How it works in four steps">
           <button class="carousel-arrow previous" aria-label="Previous step"><img data-asset="chevronLeft" src="assets/3aaa1.svg" alt=""></button>
-          <div class="slide" aria-live="polite" aria-atomic="true">
-            <div class="step-art" aria-hidden="true"><div class="campaign-list">
-              <div class="campaign-row"><img data-asset="campaign1" src="assets/44e09.png" alt=""><span class="skeleton-lines"><i></i><i></i></span><img class="row-arrow" data-asset="rowArrow" src="assets/0d767.svg" alt=""></div>
-              <div class="campaign-row"><img data-asset="campaign2" src="assets/646af.png" alt=""><span class="skeleton-lines"><i></i><i></i></span><img class="row-arrow" data-asset="rowArrow" src="assets/0d767.svg" alt=""></div>
-              <div class="campaign-row"><img data-asset="campaign3" src="assets/2d278.png" alt=""><span class="skeleton-lines"><i></i><i></i></span><img class="row-arrow" data-asset="rowArrow" src="assets/0d767.svg" alt=""></div>
-            </div><div class="step-symbol" hidden><img id="step-symbol-image" src="assets/6e8b7.svg" alt=""></div></div>
+          <div class="slide" role="group" aria-roledescription="slide" aria-live="off" aria-atomic="true">
+            <div class="step-art" aria-hidden="true"><img id="how-step-image" src="assets/how-creator-browse.png" width="731" height="193" alt="" draggable="false"></div>
             <div class="step-copy"><p id="step-label" class="eyebrow">01 / BROWSE</p><h3 id="step-title">Browse Campaigns</h3><p id="step-description">Find projects that match your audience</p></div>
           </div>
           <button class="carousel-arrow next" aria-label="Next step"><img data-asset="chevronRight" src="assets/4600e.svg" alt=""></button>
-          <p class="step-count"><span id="step-number">1</span> / 4</p>
+          <div class="how-controls" role="group" aria-label="Choose a step or pause automatic playback">
+            <p class="step-count"><span id="step-number">1</span> / 4</p>
+            <div class="how-segments">
+              <button class="how-step-button" type="button" aria-label="Go to step 1" aria-current="step"><span class="how-segment-track" aria-hidden="true"><span class="how-progress-fill"></span></span></button>
+              <button class="how-step-button" type="button" aria-label="Go to step 2"><span class="how-segment-track" aria-hidden="true"></span></button>
+              <button class="how-step-button" type="button" aria-label="Go to step 3"><span class="how-segment-track" aria-hidden="true"></span></button>
+              <button class="how-step-button" type="button" aria-label="Go to step 4"><span class="how-segment-track" aria-hidden="true"></span></button>
+            </div>
+            <span class="how-control-divider" aria-hidden="true"></span>
+            <button class="how-pause" type="button" aria-label="Pause automatic steps" aria-pressed="false"><span class="how-playback-icon" aria-hidden="true"></span></button>
+          </div>
         </div>
       </section>
 
       <section class="features-section section-grid" aria-labelledby="features-title"><div class="section-heading"><p class="eyebrow">FEATURES</p><h2 id="features-title">Everything you need<br><span class="gradient">for performance</span></h2></div><div class="features-grid" id="features-grid"></div></section>
 
-      <section id="partners" class="partners-section" aria-labelledby="partners-title"><div class="section-heading"><p class="eyebrow">TRUSTED BY THE BEST</p><h2 id="partners-title">Powering the future of<br><span class="gradient">Web3 Marketing</span></h2></div><div class="partner-window"><div class="partner-logos"><img data-asset="partner" src="assets/d6839.svg" alt="LayerZero" loading="lazy"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="lazy"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="lazy"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager"></div></div></section>
+      <section id="partners" class="partners-section" aria-labelledby="partners-title"><div class="section-heading"><p class="eyebrow">TRUSTED BY THE BEST</p><h2 id="partners-title">Powering the future of<br><span class="gradient">Web3 Marketing</span></h2></div><div class="partner-window" tabindex="0" role="region" aria-label="Partner logos. Hover or focus to pause scrolling."><div class="partner-logos"><div class="partner-logo-group"><img data-asset="partner" src="assets/d6839.svg" alt="LayerZero" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"></div><div class="partner-logo-group" aria-hidden="true"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"><img data-asset="partner" src="assets/d6839.svg" alt="" loading="eager" width="235" height="64"></div></div></div></section>
 
       <section id="faq" class="faq-section section-grid" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="faq-title">All your questions,<br><span class="gradient">answered</span></h2><a class="button secondary" href="#" data-destination="docs"><img data-asset="docIcon" src="assets/22641.svg" alt="">Read the docs <span aria-hidden="true">→</span></a></div><div class="faq-list">
         <details open><summary>What is AllWeb3?<span class="faq-icon" aria-hidden="true"></span></summary><p>AllWeb3 is a Web3 marketing platform that connects projects with creators and communities for performance-based campaigns. The platform focuses on transparent tracking and verifiable results so projects can run campaigns with clearer accountability, and creators can earn based on validated performance.</p></details>

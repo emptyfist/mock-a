@@ -46,12 +46,11 @@ const content = {
       ['Reputation Building with Certificates', 'Get paid exactly what your contributions are worth', 'reputation'],
       ['Portfolio of Successful Campaigns', 'Showcase your proven track record', 'portfolio'],
     ],
-    // Only the first slide is supplied in Figma. Remaining slides are editable preview copy.
     steps: [
-      ['BROWSE', 'Browse Campaigns', 'Find projects that match your audience', 'fair'],
-      ['CREATE', 'Create Your Content', 'Bring your perspective to the campaigns you love', 'portfolio'],
-      ['SHARE', 'Share with Your Audience', 'Publish your content and track your contribution', 'opportunities'],
-      ['EARN', 'Earn Verified Rewards', 'Get rewarded for your verified performance', 'payments'],
+      ['BROWSE', 'Browse Campaigns', 'Find projects that match your audience', 'creator-browse'],
+      ['APPLY', 'Apply to Join', 'Submit your profile and get approved', 'creator-apply'],
+      ['CREATE', 'Create Content', 'Promote the project through your channels', 'creator-create'],
+      ['EARN', 'Earn Rewards', 'Get paid automatically when results are verified', 'creator-earn'],
     ],
   },
   brand: {
@@ -68,10 +67,10 @@ const content = {
       ['Campaign Management Dashboard', 'Comprehensive tools to manage all your campaigns', 'portfolio'],
     ],
     steps: [
-      ['BROWSE', 'Browse Campaigns', 'Find projects that match your audience', 'fair'],
-      ['LAUNCH', 'Launch Your Campaign', 'Define your goals, campaign brief, and rewards', 'portfolio'],
-      ['CONNECT', 'Connect with Creators', 'Reach new audiences with creators who fit your project', 'opportunities'],
-      ['MEASURE', 'Measure Verified Results', 'Track campaign performance and validated engagement', 'fair'],
+      ['CREATE', 'Create Campaign', 'Set your goals, budget, and requirements.', 'brand-create'],
+      ['JOIN', 'Creators Join', 'Qualified creators apply to participate', 'brand-join'],
+      ['TRACK', 'Track Results', 'Monitor real-time performance with verified data', 'brand-track'],
+      ['PAY', 'Pay for Performance', 'Creators get paid automatically based on verified results', 'brand-pay'],
     ],
   },
 };
@@ -111,16 +110,15 @@ function getAssets() {
   };
 }
 
-function renderStep() {
+function renderStep(direction = 1) {
   const data = content[role].steps[step];
   document.querySelector('#step-label').textContent = `${String(step + 1).padStart(2, '0')} / ${data[0]}`;
   document.querySelector('#step-title').textContent = data[1];
   document.querySelector('#step-description').textContent = data[2];
   document.querySelector('#step-number').textContent = step + 1;
   document.querySelector('.slide').setAttribute('aria-label', `Step ${step + 1} of 4: ${data[1]}`);
-  document.querySelector('.campaign-list').hidden = step !== 0;
-  document.querySelector('.step-symbol').hidden = step === 0;
-  document.querySelector('#step-symbol-image').src = getAssets()[data[3]];
+  document.querySelector('#how-step-image').src = `assets/how-${data[3]}.png`;
+  window.howCarousel.update(role, step, direction);
 }
 
 function render() {
@@ -132,9 +130,7 @@ function render() {
   document.querySelectorAll('[data-copy]').forEach(el => { el.textContent = data[el.dataset.copy]; });
   document.querySelectorAll('[data-asset]').forEach(el => { el.src = assets[el.dataset.asset]; });
   document.querySelectorAll('[data-role]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.role === role)); });
-  const hero = document.querySelector('#hero-image');
-  hero.src = assets.hero;
-  hero.alt = data.imageAlt;
+  window.renderHero(role);
   document.querySelectorAll('[data-theme-choice]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.themeChoice === theme));
   });
@@ -165,7 +161,7 @@ document.querySelectorAll('[data-theme-choice]').forEach(button => {
     render();
   });
 });
-function changeStep(direction) { step = (step + direction + 4) % 4; renderStep(); }
+function changeStep(direction) { step = (step + direction + 4) % 4; renderStep(direction); }
 document.querySelector('.previous').addEventListener('click', () => changeStep(-1));
 document.querySelector('.next').addEventListener('click', () => changeStep(1));
 document.querySelector('.carousel').addEventListener('keydown', event => {
@@ -213,4 +209,8 @@ document.querySelectorAll('[data-destination]').forEach(link => {
 document.querySelectorAll('.dialog-close, .dialog-dismiss').forEach(button => button.addEventListener('click', () => dialog.close()));
 dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
 
+Object.values(content).flatMap(data => data.steps).forEach(stepData => {
+  const image = new Image(); image.src = `assets/how-${stepData[3]}.png`;
+});
+window.howCarousel.init(changeStep);
 render();

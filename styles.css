@@ -32,3 +32,15 @@
   background:url("assets/8f608.svg") center / 100% 100% no-repeat;
 }
 [data-theme=light] .page::after{background-image:url("assets/45f5e.svg")}
+
+/* Two equal logo groups create a continuous loop with no visible reset. */
+.partner-window{--partner-gap:43px;min-width:0;mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent)}
+.partner-window:focus-visible{outline:2px solid var(--primary);outline-offset:6px}
+.partner-window .partner-logos{gap:0;animation:partner-scroll 26s linear infinite;will-change:transform}
+.partner-logo-group{display:flex;align-items:center;gap:var(--partner-gap);padding-right:var(--partner-gap);flex-shrink:0}
+.partner-logo-group img{flex-shrink:0}
+.partner-window:hover .partner-logos,.partner-window:focus-within .partner-logos{animation-play-state:paused}
+@keyframes partner-scroll{to{transform:translateX(-50%)}}
+@media(max-width:1100px){.partner-window{--partner-gap:32px}}
+@media(max-width:760px){.partner-window{--partner-gap:30px}}
+@media(prefers-reduced-motion:reduce){.partner-window .partner-logos{animation:none;transform:none;will-change:auto}.partner-logo-group[aria-hidden=true]{display:none}.partner-window{overflow-x:auto;mask-image:none}}
