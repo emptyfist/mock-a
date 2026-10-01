@@ -1,0 +1,28 @@
+/* Full-width transparent sections over the shared body background.
+   Section padding preserves the original 1332px content area. */
+.page{max-width:none;padding:0 0 58px;--section-gutter:max(54px,calc((100% - 1332px)/2))}
+#main>section{padding-left:var(--section-gutter);padding-right:var(--section-gutter)}
+#main>.hero.hero-swipe{margin-left:0;margin-right:0;padding-left:max(100px,calc((100% - 1240px)/2));padding-right:max(100px,calc((100% - 1240px)/2))}
+/* Keep the banner artwork and border inside the same content bounds. */
+.full-width-banner>.banner{width:100%}
+.footer{width:100%;max-width:1440px;margin-left:auto;margin-right:auto;padding-left:54px;padding-right:54px}
+/* Preserve the footer glow's size while the page expands on wide screens. */
+.page::after{width:min(87.916667%,1266px)}
+@media(max-width:1100px){
+  .page{--section-gutter:30px;padding-bottom:45px}
+  #main>.hero.hero-swipe{padding-left:30px;padding-right:30px}
+  .footer{padding-left:30px;padding-right:30px}
+}
+@media(max-width:760px){
+  .page{--section-gutter:22px;padding-bottom:32px}
+  #main>.hero.hero-swipe{padding-left:22px;padding-right:22px}
+  .footer{padding-left:22px;padding-right:22px}
+}
+@media(max-width:380px){
+  .page{--section-gutter:16px}
+  #main>.hero.hero-swipe,.footer{padding-left:16px;padding-right:16px}
+}
+@media(max-width:760px){.closing-banner>.banner{min-height:330px}}
+@media(min-width:1101px) and (max-width:1300px){
+  #main>.hero.hero-swipe{padding-left:54px;padding-right:54px}
+}

@@ -1,5 +1,5 @@
 /* Hero layout and artwork follow the Figma hero and six individual cards. */
-.hero.hero-swipe{margin:0 -54px;padding:70px 100px 38px;min-height:0;isolation:isolate;background:radial-gradient(ellipse at 32% 36%,#00ff0010,transparent 52%),radial-gradient(ellipse at 85% 62%,#00ff0016,transparent 50%)}
+.hero.hero-swipe{margin:0 -54px;padding:70px 100px 38px;min-height:0;isolation:isolate}
 .hero-swipe .role-switch{width:max-content;height:auto;max-width:100%;margin:0 auto;padding:4px;gap:0;border:1px solid #ffffff33;background:#ffffff1a}
 .hero-swipe .role-switch button{font-size:14px;font-weight:500;gap:8px;padding:10px 20px;line-height:20px;min-height:40px;color:var(--text)}
 .hero-swipe .role-switch [aria-pressed=true]{background:#fff;color:#040804;border-color:transparent}
