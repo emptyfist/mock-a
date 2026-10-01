@@ -44,3 +44,8 @@
 @media(max-width:1100px){.partner-window{--partner-gap:32px}}
 @media(max-width:760px){.partner-window{--partner-gap:30px}}
 @media(prefers-reduced-motion:reduce){.partner-window .partner-logos{animation:none;transform:none;will-change:auto}.partner-logo-group[aria-hidden=true]{display:none}.partner-window{overflow-x:auto;mask-image:none}}
+
+/* Figma partner strips preserve the spacing and relative sizes of the five logos. */
+.partner-logo-group img{width:1314.23px;height:64.05px;max-width:none}
+@media(max-width:1100px){.partner-logo-group img{width:calc(1314.23px * 55 / 64.05);height:55px}}
+@media(max-width:760px){.partner-logo-group img{width:calc(1314.23px * 49 / 64.05);height:49px}}

@@ -36,7 +36,7 @@
     requestPaint();
   }
   window.howScroll = {
-    render(role, steps) {
+    render(role, steps, theme) {
       if (role !== currentRole) {
         currentRole = role;
         track.replaceChildren(...steps.map(([label, title, description, asset], i) => {
@@ -44,10 +44,15 @@
           card.className = 'slide';
           const headingId = `how-card-${i + 1}`;
           card.setAttribute('aria-labelledby', headingId);
-          card.innerHTML = `<div class="step-art" aria-hidden="true"><img src="assets/how-${asset}.png" width="731" height="193" alt="" draggable="false"></div><div class="step-copy"><p class="eyebrow">${String(i + 1).padStart(2, '0')} / ${label}</p><h3 id="${headingId}">${title}</h3><p>${description}</p></div>`;
+          card.innerHTML = `<div class="step-art" aria-hidden="true"><img src="assets/how-${theme}-${asset}.png" width="731" height="501" alt="" draggable="false"></div><div class="step-copy"><p class="eyebrow">${String(i + 1).padStart(2, '0')} / ${label}</p><h3 id="${headingId}">${title}</h3><p>${description}</p></div>`;
           return card;
         }));
       }
+      // Keep the same card elements during a theme change to preserve scroll anchoring.
+      track.querySelectorAll('.step-art img').forEach((image, i) => {
+        const src = `assets/how-${theme}-${steps[i][3]}.png`;
+        if (image.getAttribute('src') !== src) image.setAttribute('src', src);
+      });
       requestAnimationFrame(measure);
     },
   };

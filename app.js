@@ -101,7 +101,7 @@ function getAssets() {
     banner: dark ? raw.imgImage35 : raw.imgChatGptImageSep162026030635Am1,
     earth: dark ? raw.imgImage36 : raw.imgImage38,
     hero: creator ? (dark ? raw.imgChatGptImageSep142026083837Pm1 : raw.imgImage39) : (dark ? raw.imgImage37 : raw.imgChatGptImageSep162026030303Am1),
-    partner: raw.imgGroup2,
+    partner: `assets/partners-${theme}.png`,
     campaign1: raw.imgEllipse7486, campaign2: raw.imgEllipse7489, campaign3: raw.imgEllipse7487,
     chevronLeft: raw.imgChevronLeft, chevronRight: raw.imgChevronRight, rowArrow: raw.imgVector11,
     opportunities: raw[`imgIcon${featureOffset}`], payments: raw[`imgIcon${featureOffset + 1}`],
@@ -133,7 +133,7 @@ function render() {
     copy.append(heading, body); article.append(image, copy); return article;
   });
   document.querySelector('#features-grid').replaceChildren(...cards);
-  window.howScroll.render(role, data.steps);
+  window.howScroll.render(role, data.steps, theme);
   applyDestinationLinks();
 }
 
@@ -189,7 +189,9 @@ document.querySelectorAll('[data-destination]').forEach(link => {
 document.querySelectorAll('.dialog-close, .dialog-dismiss').forEach(button => button.addEventListener('click', () => dialog.close()));
 dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
 
-Object.values(content).flatMap(data => data.steps).forEach(stepData => {
-  const image = new Image(); image.src = `assets/how-${stepData[3]}.png`;
+['dark', 'light'].forEach(cardTheme => {
+  Object.values(content).flatMap(data => data.steps).forEach(stepData => {
+    const image = new Image(); image.src = `assets/how-${cardTheme}-${stepData[3]}.png`;
+  });
 });
 render();

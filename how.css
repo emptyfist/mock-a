@@ -5,8 +5,8 @@
 #how-it-works .section-heading{padding-top:0;align-self:center}
 .how-viewport{width:100%;max-width:731px;justify-self:end;min-width:0;overflow:hidden;border-radius:15px}
 .how-track{display:flex;gap:24px;will-change:transform}
-#how-it-works .slide{flex:0 0 100%;min-width:0;height:auto;min-height:407px}
-#how-it-works .step-art{height:auto;aspect-ratio:731 / 193;background:#073707}
+#how-it-works .slide{flex:0 0 100%;min-width:0;height:auto;min-height:501px}
+#how-it-works .step-art{height:auto;aspect-ratio:731 / 287;background:#073707}
 #how-it-works .step-art img{width:100%;height:auto;display:block}
 #how-it-works .step-copy{min-height:214px;padding:22px 35px 32px}
 #how-it-works .step-copy .eyebrow{color:#8e8e93;font-weight:400;letter-spacing:0}
