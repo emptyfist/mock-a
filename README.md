@@ -1,38 +1,26 @@
-# AllWeb3 landing page
+# AllWeb3 onboarding prototype
 
-Plain HTML, CSS, and JavaScript. No build step or runtime dependencies.
+Open `index.html` in a browser. No server, installation, or internet connection is needed. Keep all HTML, CSS, JavaScript, and assets together.
 
-## Preview
+- `index.html`: main page; select Creator or Brand, then Enter App.
+- `creator-onboarding.html`: Creator onboarding.
+- `project-onboarding.html`: Brand / Project onboarding.
+- `portal.html`: mock signed-in portal welcome page.
 
-Open `index.html` directly, or run:
+## Sign in
 
-```sh
-python3 -m http.server 4173 --bind 127.0.0.1
-```
+Select Sign in on the account access screen. Email sign-in accepts any valid-looking email; Google sign-in uses a mock account chooser. Both go directly to the welcome page displaying “Welcome, you can operate our Portals”, without OTP or onboarding.
 
-Then visit http://127.0.0.1:4173.
+## Sign up
 
-The role switch changes the headline, copy, illustration, calls to action, and feature cards. The theme button switches the complete color and image system. Both choices persist locally. The carousel and FAQ are keyboard accessible, and the mobile navigation is collapsible.
+Email sign-up still accepts any six-digit OTP (e.g. 123456). Google sign-up uses the mock account chooser. Then choose an account type, verify a social channel, set up a profile, and choose preferences. Social verification closes automatically. Profile images are previewed locally, or you can choose a demo avatar.
 
-Use `?role=creator&theme=dark`, `?role=brand&theme=dark`, `?role=creator&theme=light`, or `?role=brand&theme=light` to open a specific state for review.
+## Preferences
 
-## Figma references
+Connect MetaMask, Coinbase Wallet, or Binance Wallet through a mock confirmation popup. The connected wallet’s full sample address is displayed. Switching providers replaces the connection; Disconnect clears it. Wallet connection is optional. Select one to three Verticals. Languages and Creator content format have been removed. Project accounts retain the campaign goal field.
 
-The labels in the supplied message are reversed relative to the actual selected role and content in the frames. Implementation follows the visible design:
+Back navigation preserves values during the walkthrough. Refresh clears state. Authentication, social verification, and wallet connections are entirely simulated: no backend requests, wallet extensions, signatures, or transactions.
 
-| Actual state | Figma node |
-| --- | --- |
-| Dark Creator | 11595:36457 |
-| Dark Brand | 11592:31353 |
-| Light Creator | 11604:2829 |
-| Light Brand | 11612:818 |
+The main-page artwork and wordmark approximate the supplied screenshot in HTML/CSS. Onboarding background and icons are local Figma assets. Fonts use browser fallbacks.
 
-The desktop reference is 1440px wide. Mobile layout and the theme switch are additions. “on-chian” in the closing banner was corrected to “on-chain”; the Creator steps heading consistently uses “Start earning”. The repeated LayerZero logos and 1K+ statistics are retained from the supplied design.
-
-`design-reference/` contains the retrieved reference code, not production components. `assets/` contains the original exported Figma images and icons, plus the Inter font. `assets.js` maps these to the four states. Asset files are local so the page does not depend on expiring Figma URLs. `scripts/download-assets.py` can re-download the original assets while those source URLs remain valid.
-
-## Preview content and destinations
-
-As requested, no external destinations are connected. Buttons open a local preview notice. Fill in `destinations` at the top of `app.js` when URLs are available.
-
-The designs supply only the first carousel slide and the first expanded FAQ answer. Slides 2–4 and the remaining FAQ answers are provisional copy for demonstrating interactions; review them before publishing. The Brand first slide preserves the supplied “Browse Campaigns” content.
+Verified in Chrome: email and Google sign-in for both account types, Creator email OTP sign-up, Project Google sign-up, all three wallet providers, valid sample address formats, three-vertical limit, state retention, mobile layout, and completion. Also verified local file execution.

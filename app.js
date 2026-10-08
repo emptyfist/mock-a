@@ -1,197 +1,52 @@
-const destinations = {
-  app: {
-    creator: 'https://alpha.creator.allweb3.io',
-    brand: 'https://alpha.project.allweb3.io',
-  },
-  role: {
-    creator: 'https://alpha.creator.allweb3.io/campaign',
-    brand: 'https://alpha.project.allweb3.io',
-  },
-  docs: 'https://docs.allweb3.io/',
-  twitter: 'https://x.com/AllWeb3_io',
-  medium: 'https://allweb3.medium.com',
-  creator: 'https://creator.allweb3.io',
-  brand: 'https://project.allweb3.io',
-  contact: 'mailto:team@allweb3.io',
-  terms: 'https://allweb3.io/terms',
-  privacy: 'https://allweb3.io/policy',
-};
-
-function destinationUrl(key, currentRole = role) {
-  const value = destinations[key];
-  if (value == null) return null;
-  if (typeof value === 'object') return value[currentRole] ?? null;
-  return value;
+'use strict';
+const $=(s,root=document)=>root.querySelector(s), $$=(s,root=document)=>[...root.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icon=(name,alt='')=>`<img class="asset" src="assets/${name}.svg" alt="${alt}">`;
+const modal=$('#modal');let modalTimer=null;let returnFocus=null;
+function closeModal(){clearTimeout(modalTimer);modal.close();returnFocus?.focus()}
+function openModal(html){clearTimeout(modalTimer);returnFocus=document.activeElement;modal.innerHTML=`<button class="close" aria-label="Close dialog">×</button>${html}`;$('.close',modal).onclick=closeModal;if(!modal.open)modal.showModal()}
+modal.addEventListener('cancel',()=>clearTimeout(modalTimer));
+function info(topic){const text={docs:['How this prototype works','Choose Creator or Brand, then complete five steps: account access, account type, social verification, profile, and preferences. All verification is simulated. Any six digits work for the email code.'],Terms:['Demo terms','This is a local onboarding prototype. It creates no real account, sends no email, and makes no social connection.'],Privacy:['Your demo data','Form values stay in this browser tab’s memory. Refreshing clears the onboarding flow. Profile images are previewed locally and are never uploaded.'],Help:['Need a hand?','Sign in with email or a mock Google account to open the portal directly. For email sign-up, enter any six-digit code. During onboarding, select a social channel, set up your profile, and choose up to three verticals. Wallet connections are simulated.']};let [title,body]=text[topic]||text.docs;openModal(`<h2>${title}</h2><p>${body}</p><button class="primary full" id="got-it">Got it</button>`);$('#got-it').onclick=closeModal}
+function toast(text){$('.toast')?.remove();let e=document.createElement('div');e.className='toast';e.role='status';e.textContent=text;document.body.append(e);setTimeout(()=>e.remove(),2600)}
+if(document.body.classList.contains('landing')){
+ $$('[data-role]').forEach(b=>b.onclick=()=>{let brand=b.dataset.role==='project';$$('[data-role]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));$$('.enter').forEach(x=>x.href=brand?'project-onboarding.html':'creator-onboarding.html');$('#headline').innerHTML=brand?'Your project deserves<br><span>more than attention.</span>':'Your creativity deserves<br><span>more than impressions.</span>';$('#hero-copy').innerHTML=brand?'Connect with Web3 creators, launch campaigns, and turn<br>authentic contributions into measurable growth.':'Find Web3 campaigns, create content, and turn verified<br>contributions into rewards.';$('#why').textContent=brand?'WHY ALLWEB3 FOR BRANDS':'WHY ALLWEB3 FOR CREATORS';$('#feature-title').innerHTML=brand?'Your vision has<br>potential.<br><em>Make it grow.</em>':'Your work has<br>value.<br><em>Make it count.</em>';$('#feature-text').textContent=brand?'AllWeb3 connects your project to the right creators, with clear campaign goals, verified contributions, and visible results.':'AllWeb3 connects your content to campaigns with clear tasks, visible performance, and rewards tied to what you deliver.';$('#showcase-title').textContent=brand?'Grow':'Earn';$('#showcase-copy').textContent=brand?'Build authentic momentum with creators who understand your project and community.':'Get rewarded for the content you create, the results you drive, and the work you deliver.'});$('.theme').onclick=()=>document.body.classList.toggle('light');$('[data-info]').onclick=()=>info('docs');
+}else{
+ const state={role:document.body.dataset.initialRole,step:0,mode:'signup',email:'',method:'Email',social:'',verified:false,profiles:{creator:{name:'',bio:'',website:'',avatar:'',color:''},project:{name:'',bio:'',website:'',avatar:'',color:''}},prefs:{creator:{areas:[],wallet:null},project:{areas:[],wallet:null,goal:'Brand awareness'}}};
+ const steps=['Account access','Account type','Social verification','Profile setup','Preferences'];const areaOptions=['DeFi','NFTs','Gaming','Trading','L2 Solutions','Infra','Metaverse','DAO Governance'];
+ const profile=()=>state.profiles[state.role],prefs=()=>state.prefs[state.role],isProject=()=>state.role==='project';
+ function setStep(n){state.step=n;history.replaceState(null,'',`#${n===5?'complete':n+1}`);render();window.scrollTo(0,0);$('#step-title')?.focus()}
+ function error(t){$('#error').textContent=t}
+ function saveFields(){if(state.step===0&&$('#email'))state.email=$('#email').value;if(state.step===3){profile().name=$('#display-name').value;profile().bio=$('#bio').value;profile().website=$('#website')?.value||''}if(state.step===4&&$('#goal'))prefs().goal=$('#goal').value}
+ function avatarHTML(){return profile().avatar?`<img class="uploaded" src="${esc(profile().avatar)}" alt="Your profile preview">`:profile().color?`<span>${esc((profile().name|| (isProject()?'P':'C')).slice(0,1).toUpperCase())}</span>`:icon('avatar-detail')}
+ function render(){let brand=isProject(),p=profile(),pr=prefs();let title=['Welcome to AllWeb3','Account type','Social verification',brand?'Project profile':'Creator profile','Your preferences',brand?'Your project is ready.':'You’re ready to create.'][state.step];let subtitle=[`Your ${brand?'project':'creator'} journey starts here.`, 'Tell us how you would like to use AllWeb3.',brand?'Connect a project channel to establish your brand’s presence.':'Connect a channel to match with relevant campaigns.',brand?'Introduce your project to the right creators.':'Set up your profile so projects can get to know you.',brand?'Find creators who share your project’s focus.':'Personalize the campaigns and opportunities you see.',brand?'Meet creators and bring your next campaign to life.':'Discover campaigns that fit your voice and interests.'][state.step];
+ let body='';
+ if(state.step===0)body=`<button type="button" class="google" id="google"><b>G</b> ${state.mode==='signup'?'Sign up':'Sign in'} with Google</button><div class="divider">or continue with email</div><label for="email">Email address <em>*</em></label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" value="${esc(state.email)}"><p class="hint">${state.mode==='signup'?'We’ll verify your email with a one-time code. No password needed.':'Sign in to go directly to your portal. No verification code needed in this demo.'}</p><p class="switch-auth">${state.mode==='signup'?'Already have an account?':'New to AllWeb3?'} <button type="button" class="link-button" id="auth-mode">${state.mode==='signup'?'Sign in':'Sign up'}</button></p><p class="hint">Interactive demo · No real account or email is created.</p>`;
+ if(state.step===1)body=['creator','project'].map(r=>`<button type="button" class="choice ${state.role===r?'selected':''}" data-account="${r}" aria-pressed="${state.role===r}"><strong>${r==='creator'?'Creator Profile':'Project Profile'}</strong>${state.role===r?`<span class="check">${icon('check')}</span>`:''}<p>${r==='creator'?'Discover campaigns, share your creativity, and earn rewards for verified contributions.':'Represent your brand, connect with creators, and launch campaigns that grow your community.'}</p></button>`).join('')+'<p class="hint">Your landing page selection is preselected. You can change it here.</p>';
+ if(state.step===2)body=(brand?['X / Twitter','LinkedIn','YouTube']:['X / Twitter','YouTube','LinkedIn']).map(s=>`<button type="button" class="choice social-choice ${state.social===s?'selected':''}" data-social="${s}" aria-pressed="${state.social===s}"><strong>${s}</strong>${state.social===s?`<span class="check">${icon('check')}</span>`:''}<p>${brand?'Verify your project’s official channel.':'Connect your reach, content, and audience.'}</p><span class="social-action">${state.social===s?(state.verified?'✓ Verified in demo':'Selected · verify on Next'):'Select channel'}</span></button>`).join('')+'<p class="hint">Select one channel to continue. Verification is simulated.</p>';
+ if(state.step===3)body=`<label for="display-name">${brand?'Project name':'Display name'} <em>*</em></label><input id="display-name" required maxlength="60" placeholder="${brand?'Your project name':'How should we call you?'}" value="${esc(p.name)}"><div class="field-label">${brand?'Project logo':'Profile picture'} <em>*</em></div><div class="avatar-wrap"><div class="avatar" style="${p.color?'background:'+p.color:''}">${avatarHTML()}</div><div class="avatar-actions"><button type="button" class="secondary" id="upload">${icon('upload')} Upload ${brand?'logo':'photo'}</button><button type="button" class="secondary" id="edit-avatar">${icon('edit')} Demo ${brand?'logo':'avatar'}</button></div><input type="file" id="photo-file" accept="image/png,image/jpeg,image/webp" hidden><p class="hint">PNG, JPG or WebP · up to 5 MB, or use a demo ${brand?'logo':'avatar'}.</p></div>${brand?`<label for="website">Project website <em>*</em></label><input id="website" type="url" required placeholder="https://yourproject.com" value="${esc(p.website)}">`:''}<label for="bio">${brand?'About your project':'Short bio'} <span class="hint">(optional)</span></label><textarea id="bio" maxlength="240" placeholder="${brand?'What are you building?':'Tell projects a little about yourself.'}">${esc(p.bio)}</textarea>`;
+ if(state.step===4)body=`<div class="field-label">Connect a wallet <span class="hint">(optional)</span></div><p class="hint">Choose a wallet to simulate a connection.</p><div class="wallet-options">${['MetaMask','Coinbase Wallet','Binance Wallet'].map((w,i)=>`<button type="button" class="wallet-option" data-wallet="${w}" aria-pressed="${pr.wallet?.provider===w}"><span class="wallet-symbol wallet-${i}">${['M','C','B'][i]}</span><span>${w}</span><span class="wallet-action">${pr.wallet?.provider===w?'✓ Connected':'Connect ↗'}</span></button>`).join('')}</div>${pr.wallet?`<div class="connected-wallet" role="status"><span class="eyebrow">WALLET CONNECTED · MOCK</span><p>${esc(pr.wallet.provider)}</p><code>${esc(pr.wallet.address)}</code><button type="button" class="link-button" id="disconnect-wallet">Disconnect wallet</button></div>`:''}<p class="hint">Demo only. No extension, signature, or real wallet is required.</p><div class="field-label">Verticals (max 3) <em>*</em></div><div class="chips">${areaOptions.map(a=>`<button type="button" class="chip" data-area="${a}" aria-pressed="${pr.areas.includes(a)}">${a}</button>`).join('')}</div><p class="hint" aria-live="polite">Selected ${pr.areas.length} / 3 verticals.</p>${brand?`<label for="goal">Primary campaign goal</label><select id="goal">${['Brand awareness','Community growth','Product launch','User acquisition'].map(v=>`<option ${pr.goal===v?'selected':''}>${v}</option>`).join('')}</select>`:''}`;
+ if(state.step===5)body=`<div class="success-mark">✓</div><p class="eyebrow">${brand?'PROJECT APP':'CREATOR APP'} · DEMO READY</p><div class="summary-box"><p>Profile <strong>${esc(p.name)}</strong></p><p>Account <strong>${brand?'Project / Brand':'Creator'}</strong></p><p>Signed in via <strong>${esc(state.method)}</strong></p><p>Email <strong>${esc(state.email)}</strong></p><p>Social <strong>${esc(state.social)} · verified</strong></p><p>Verticals <strong>${esc(pr.areas.join(', '))}</strong></p><p>Wallet <strong>${pr.wallet?esc(pr.wallet.provider)+'<br>'+esc(pr.wallet.address):'Not connected'}</strong></p>${brand?`<p>Campaign goal <strong>${esc(pr.goal)}</strong></p>`:''}</div><p class="hint">Onboarding complete. This prototype stops here; your demo account is not saved to a server.</p>`;
+ $('#onboarding').innerHTML=`<div class="onboard-layout"><section class="onboard-panel"><div class="panel-head"><button class="back" id="back">‹ &nbsp;${state.step===0||state.step===5?'Back to home':'Back'}</button><span class="app-tag">${brand?'Project App':'Creator App'}</span></div><h1 id="step-title" tabindex="-1">${title}</h1><p class="subtitle">${subtitle}</p><form id="step-form"><div class="step-body">${body}<div id="error" class="error" role="alert"></div></div><div class="step-footer"><button class="primary" type="submit">${state.step===0?(state.mode==='signup'?'Sign up with email':'Sign in with email'):state.step===4?'Finish setup':state.step===5?'Explore demo app':'Next'} ${icon('arrow')}</button>${state.step<5?`<div class="progress" aria-label="Step ${state.step+1} of 5">${steps.map((_,i)=>`<span class="${i===state.step?'active':i<state.step?'done':''}"></span>`).join('')}</div><div class="step-caption">${String(state.step+1).padStart(2,'0')} / 05 &nbsp; ${steps[state.step]}</div>`:'<button type="button" id="restart" class="link-button full">Start another walkthrough</button>'}</div></form></section><aside class="journey"><a href="index.html" class="logo">ALLWEB3</a><h2>${brand?'Build your next chapter.':'Make your creativity count.'}</h2><p>${brand?'A few steps to connect your project with creators who move it forward.':'A few steps to connect your talent with the right opportunities.'}</p><ol>${steps.map((s,i)=>`<li class="${i===state.step?'current':''}" ${i===state.step?'aria-current="step"':''}><span>${i<state.step?'✓':i+1}</span>${s}</li>`).join('')}</ol><p class="demo-note">Interactive onboarding prototype<br>Email, Google, and social verification are simulated.</p></aside></div><footer class="onboard-footer">${['Terms','Privacy','Docs','Help'].map(t=>`<button type="button" data-info="${t==='Docs'?'docs':t}">${t}</button>`).join(icon('dot'))}<span class="footer-language">${icon('globe')} English ${icon('chevron')}</span></footer>`;
+ $('#back').onclick=()=>{saveFields();if(state.step===0||state.step===5)location.href='index.html';else setStep(state.step-1)};
+ $$('[data-info]').forEach(b=>b.onclick=()=>info(b.dataset.info));
+ $('#step-form').onsubmit=e=>{e.preventDefault();saveFields();if(state.step===0){state.method='Email';if(state.mode==='signin')location.href='portal.html';else showOTP()}else if(state.step===1)setStep(2);else if(state.step===2){if(!state.social)return error('Select a social channel to continue.');if(state.verified)setStep(3);else verifySocial()}else if(state.step===3){if(!p.name.trim())return error('Enter a display name to continue.');if(!p.avatar&&!p.color)return error(`Upload a ${brand?'logo':'photo'} or choose a demo ${brand?'logo':'avatar'}.`);setStep(4)}else if(state.step===4){if(!pr.areas.length)return error('Select at least one vertical.');setStep(5)}else showDestination()};
+ if(state.step===0){$('#auth-mode').onclick=()=>{saveFields();state.mode=state.mode==='signup'?'signin':'signup';render()};$('#google').onclick=showGoogle}
+ $$('[data-account]').forEach(b=>b.onclick=()=>{if(state.role!==b.dataset.account){state.role=b.dataset.account;state.social='';state.verified=false}render()});
+ $$('[data-social]').forEach(b=>b.onclick=()=>{if(state.social!==b.dataset.social)state.verified=false;state.social=b.dataset.social;render()});
+ if(state.step===3){$('#upload').onclick=()=>$('#photo-file').click();$('#photo-file').onchange=e=>{let f=e.target.files[0];if(!f)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>5*1024*1024)return error('Choose a PNG, JPG, or WebP image smaller than 5 MB.');saveFields();let reader=new FileReader();reader.onload=()=>{let test=new Image();test.onload=()=>{p.avatar=reader.result;render()};test.onerror=()=>error('This image could not be opened. Please choose another file.');test.src=reader.result};reader.readAsDataURL(f)};$('#edit-avatar').onclick=()=>{saveFields();openModal(`<h2>Choose a demo ${brand?'logo':'avatar'}</h2><p>Pick a color. We’ll use the first letter of your name.</p><div class="swatches">${['#baff7c','#80d8ff','#c8a2ff','#ffc98a'].map(c=>`<button aria-label="Choose ${c}" data-color="${c}" style="background:${c}"></button>`).join('')}</div>`);$$('[data-color]').forEach(b=>b.onclick=()=>{p.color=b.dataset.color;p.avatar='';closeModal();render()})}}
+ $$('[data-area]').forEach(b=>b.onclick=()=>{saveFields();let a=b.dataset.area;if(pr.areas.includes(a))pr.areas=pr.areas.filter(x=>x!==a);else if(pr.areas.length<3)pr.areas.push(a);else return error('You can select up to 3 verticals. Deselect one to add another.');render()});
+ $$('[data-wallet]').forEach(b=>b.onclick=()=>{saveFields();connectWallet(b.dataset.wallet)});
+ $('#disconnect-wallet')?.addEventListener('click',()=>{saveFields();pr.wallet=null;render()});
+ $('#restart')?.addEventListener('click',()=>location.href='index.html');
+ }
+ function connectWallet(provider){
+  const addresses={'MetaMask':'0x7A12bC3456De7890fA1234567890bCDeF1234567','Coinbase Wallet':'0xC01234567890abCDef1234567890AbCDeF123456','Binance Wallet':'0xB01234567890abCDef1234567890AbCDeF123456'};
+  openModal(`<div class="modal-icon">◇</div><h2>Connect ${esc(provider)}</h2><p>Mock wallet connection</p><p>This demo will display a sample wallet address. No wallet permissions or signatures are requested.</p><button type="button" class="primary full" id="confirm-wallet">Connect mock wallet</button>`);
+  $('#confirm-wallet').onclick=()=>{$('#confirm-wallet').disabled=true;$('#confirm-wallet').textContent='Connecting…';modalTimer=setTimeout(()=>{prefs().wallet={provider,address:addresses[provider]};closeModal();render()},900)};
+ }
+ function showOTP(){openModal(`<div class="modal-icon">✉</div><h2>Check your email</h2><p>Enter the six-digit code for <strong>${esc(state.email)}</strong>.</p><p class="hint">Demo mode: any 6 digits work, for example 123456. No email is sent.</p><form id="otp-form"><div class="otp-row">${Array.from({length:6},(_,i)=>`<input aria-label="Digit ${i+1}" inputmode="numeric" pattern="[0-9]" maxlength="1" ${i===0?'autocomplete="one-time-code"':''} required>`).join('')}</div><p id="otp-status" role="status" class="hint"></p><button class="primary full" type="submit">Verify & continue ${icon('arrow')}</button></form><button class="link-button full" id="resend">Resend code</button>`);const inputs=$$('.otp-row input');inputs[0].focus();inputs.forEach((input,i)=>{input.oninput=()=>{input.value=input.value.replace(/\D/g,'').slice(-1);if(input.value)inputs[i+1]?.focus()};input.onkeydown=e=>{if(e.key==='Backspace'&&!input.value)inputs[i-1]?.focus();if(e.key==='ArrowLeft')inputs[i-1]?.focus();if(e.key==='ArrowRight')inputs[i+1]?.focus()};input.onpaste=e=>{e.preventDefault();let code=e.clipboardData.getData('text').replace(/\D/g,'').slice(0,6);[...code].forEach((d,j)=>{if(inputs[i+j])inputs[i+j].value=d});inputs[Math.min(i+code.length,5)].focus()}});$('#otp-form').onsubmit=e=>{e.preventDefault();if(inputs.every(i=>/^\d$/.test(i.value))){closeModal();setStep(1)}};$('#resend').onclick=()=>{$('#otp-status').textContent='New mock code ready. Enter any six digits.';inputs.forEach(i=>i.value='');inputs[0].focus()}}
+ function showGoogle(){openModal(`<div class="modal-icon">G</div><h2>Choose an account</h2><p>Mock Google ${state.mode==='signup'?'sign-up':'sign-in'} · continue to AllWeb3</p><button class="account-row" id="mock-google"><span>D</span><div>Demo ${isProject()?'Brand':'Creator'}<small>${isProject()?'brand':'creator'}@example.com</small></div></button><p class="hint">This account is a placeholder. Google is not contacted.</p>`);$('#mock-google').onclick=()=>{state.method='Google';state.email=`${isProject()?'brand':'creator'}@example.com`;closeModal();if(state.mode==='signin')location.href='portal.html';else setStep(1)}}
+ function verifySocial(){openModal(`<div class="center"><div class="spinner"></div><h2>Mock Social verification</h2><p>Connecting your ${esc(state.social)} ${isProject()?'project channel':'account'}…</p><p class="hint">This takes a moment. No permissions are requested.</p><div role="status" aria-live="polite" id="social-status">Verifying demo connection</div></div>`);modalTimer=setTimeout(()=>{$('#social-status').textContent='✓ Connection verified';modalTimer=setTimeout(()=>{state.verified=true;closeModal();setStep(3)},650)},1300)}
+ function showDestination(){openModal(`<div class="modal-icon">✓</div><h2>Welcome to the ${isProject()?'Project':'Creator'} App</h2><p>${isProject()?'Your next step would be to create a campaign and invite creators.':'Your next step would be to browse matching campaigns and apply.'}</p><div class="summary-box"><strong>${isProject()?'Create your first campaign':'Discover your first campaign'}</strong><p>Recommended verticals: ${esc(prefs().areas.join(', '))}</p></div><p class="hint">This is the final destination preview of the onboarding mockup.</p><button class="primary full" id="home">Return to home</button>`);$('#home').onclick=()=>location.href='index.html'}
+ render();
 }
-
-function applyDestinationLinks() {
-  document.querySelectorAll('[data-destination]').forEach(link => {
-    const key = link.dataset.destination;
-    const url = destinationUrl(key);
-    link.href = url || '#';
-  });
-}
-
-const content = {
-  creator: {
-    heroTitle: 'Get rewarded for the', heroAccent: 'attention you create',
-    heroDescription: 'AllWeb3 is an onchain marketing platform that lets anyone earn by sharing campaigns.',
-    cta: 'Start Earning', bannerTitle: 'Earn Rewards for', bannerAccent: 'Your Influence and Content',
-    bannerDescription: 'Turn your creativity and reach into verifiable earnings', howTitle: 'Start earning',
-    imageAlt: 'Green glass panels showing Create, Share, Earn and campaign rewards',
-    features: [
-      ['Fair Compensation for Verified Work', 'Get paid exactly what your contributions are worth', 'fair'],
-      ['Multiple Earning Opportunities', 'Access diverse campaigns across industries', 'opportunities'],
-      ['Automatic Payment System', 'Receive payments instantly upon verification', 'payments'],
-      ['Reputation Building with Certificates', 'Get paid exactly what your contributions are worth', 'reputation'],
-      ['Portfolio of Successful Campaigns', 'Showcase your proven track record', 'portfolio'],
-    ],
-    steps: [
-      ['BROWSE', 'Browse Campaigns', 'Find projects that match your audience', 'creator-browse'],
-      ['APPLY', 'Apply to Join', 'Submit your profile and get approved', 'creator-apply'],
-      ['CREATE', 'Create Content', 'Promote the project through your channels', 'creator-create'],
-      ['EARN', 'Earn Rewards', 'Get paid automatically when results are verified', 'creator-earn'],
-    ],
-  },
-  brand: {
-    heroTitle: 'Turn creators into your', heroAccent: 'growth engine',
-    heroDescription: 'Launch performance-driven campaigns powered by real creators. Every post is AI-scored, every result is verified onchain, and you only pay for the engagement that actually delivers.',
-    cta: 'Launch Campaign', bannerTitle: 'Launch Campaigns that Deliver', bannerAccent: 'Real Results.',
-    bannerDescription: 'Connect with creators who drive measurable impact for your project', howTitle: 'Start growing',
-    imageAlt: 'Green glass panels showing Create Campaign, Pay for Real Results and measurable growth',
-    features: [
-      ['Verified Campaign Performance Tracking', 'Real-time analytics with on-chain verification', 'fair'],
-      ['Direct Access to Creator Network', 'Connect with thousands of qualified creators', 'opportunities'],
-      ['Transparent Pricing and Payments', 'Clear costs and automatic payment processing', 'payments'],
-      ['On-Chain Proof of Results', 'Immutable verification of campaign performance', 'reputation'],
-      ['Campaign Management Dashboard', 'Comprehensive tools to manage all your campaigns', 'portfolio'],
-    ],
-    steps: [
-      ['CREATE', 'Create Campaign', 'Set your goals, budget, and requirements.', 'brand-create'],
-      ['JOIN', 'Creators Join', 'Qualified creators apply to participate', 'brand-join'],
-      ['TRACK', 'Track Results', 'Monitor real-time performance with verified data', 'brand-track'],
-      ['PAY', 'Pay for Performance', 'Creators get paid automatically based on verified results', 'brand-pay'],
-    ],
-  },
-};
-
-function readPreference(key, fallback) {
-  try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
-}
-function savePreference(key, value) {
-  try { localStorage.setItem(key, value); } catch { /* File previews can block storage. */ }
-}
-const parameters = new URLSearchParams(location.search);
-let role = parameters.get('role') || readPreference('aw3-role', 'creator');
-let theme = parameters.get('theme') || readPreference('aw3-theme', 'dark');
-if (!Object.hasOwn(content, role)) role = 'creator';
-if (!['dark', 'light'].includes(theme)) theme = 'dark';
-
-function getAssets() {
-  const raw = window.AW3_ASSETS[`${theme}-${role}`];
-  const dark = theme === 'dark';
-  const creator = role === 'creator';
-  const featureOffset = dark && !creator ? 5 : 4;
-  return {
-    logoMark: raw.imgGroup2087327757, logoWord: raw.imgGroup2087327799,
-    creatorIcon: raw.imgProfileSvgrepoCom11, brandIcon: raw.imgProfile2UserSvgrepoCom1,
-    ctaIcon: creator ? raw.imgCoinsSvgrepoCom11 : (dark ? raw.imgIcon : raw.imgGroup2087328509),
-    ctaArrow: creator ? raw.imgIcon : (dark ? raw.imgIcon1 : raw.imgIcon),
-    docIcon: raw.imgDocTextFillSvgrepoCom1,
-    banner: dark ? raw.imgImage35 : raw.imgChatGptImageSep162026030635Am1,
-    earth: dark ? raw.imgImage36 : raw.imgImage38,
-    hero: creator ? (dark ? raw.imgChatGptImageSep142026083837Pm1 : raw.imgImage39) : (dark ? raw.imgImage37 : raw.imgChatGptImageSep162026030303Am1),
-    partner: `assets/partners-${theme}.png`,
-    campaign1: raw.imgEllipse7486, campaign2: raw.imgEllipse7489, campaign3: raw.imgEllipse7487,
-    chevronLeft: raw.imgChevronLeft, chevronRight: raw.imgChevronRight, rowArrow: raw.imgVector11,
-    opportunities: raw[`imgIcon${featureOffset}`], payments: raw[`imgIcon${featureOffset + 1}`],
-    reputation: raw[`imgIcon${featureOffset + 2}`], portfolio: raw[`imgIcon${featureOffset + 3}`], fair: raw[`imgIcon${featureOffset + 4}`],
-  };
-}
-
-function render() {
-  const data = content[role];
-  const assets = getAssets();
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.dataset.role = role;
-  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#070d08' : '#ebf7eb';
-  document.querySelectorAll('[data-copy]').forEach(el => { el.textContent = data[el.dataset.copy]; });
-  document.querySelectorAll('[data-asset]').forEach(el => { el.src = assets[el.dataset.asset]; });
-  document.querySelectorAll('[data-role]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.role === role)); });
-  window.renderHero(role);
-  document.querySelectorAll('[data-theme-choice]').forEach(button => {
-    button.setAttribute('aria-pressed', String(button.dataset.themeChoice === theme));
-  });
-  const cards = data.features.map(([title, description, icon]) => {
-    const article = document.createElement('article');
-    article.className = 'feature-card';
-    const image = document.createElement('img');
-    image.src = assets[icon]; image.alt = ''; image.width = 50; image.height = 50;
-    const copy = document.createElement('div');
-    const heading = document.createElement('h3'); heading.textContent = title;
-    const body = document.createElement('p'); body.textContent = description;
-    copy.append(heading, body); article.append(image, copy); return article;
-  });
-  document.querySelector('#features-grid').replaceChildren(...cards);
-  window.howScroll.render(role, data.steps, theme);
-  applyDestinationLinks();
-}
-
-document.querySelectorAll('[data-role]').forEach(button => {
-  button.addEventListener('click', () => {
-    role = button.dataset.role; savePreference('aw3-role', role); render();
-  });
-});
-document.querySelectorAll('[data-theme-choice]').forEach(button => {
-  button.addEventListener('click', () => {
-    theme = button.dataset.themeChoice;
-    savePreference('aw3-theme', theme);
-    render();
-  });
-});
-document.querySelectorAll('.faq-list details').forEach(detail => {
-  detail.addEventListener('toggle', () => {
-    if (detail.open) document.querySelectorAll('.faq-list details').forEach(other => { if (other !== detail) other.open = false; });
-  });
-});
-
-const siteHeader = document.querySelector('.site-header');
-function updateStickyHeader() {
-  siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
-}
-updateStickyHeader();
-window.addEventListener('scroll', updateStickyHeader, { passive: true });
-
-const navigation = document.querySelector('.header nav');
-const menuToggle = document.querySelector('.menu-toggle');
-function closeMenu() { navigation.classList.remove('is-open'); menuToggle.setAttribute('aria-expanded', 'false'); menuToggle.setAttribute('aria-label', 'Open navigation'); }
-menuToggle.addEventListener('click', () => {
-  const open = navigation.classList.toggle('is-open');
-  menuToggle.setAttribute('aria-expanded', String(open)); menuToggle.setAttribute('aria-label', `${open ? 'Close' : 'Open'} navigation`);
-});
-navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
-
-const dialog = document.querySelector('#link-dialog');
-document.querySelectorAll('[data-destination]').forEach(link => {
-  link.addEventListener('click', event => {
-    const url = destinationUrl(link.dataset.destination);
-    if (url) {
-      link.href = url;
-      return;
-    }
-    event.preventDefault();
-    document.querySelector('#dialog-title').textContent = link.textContent.trim().replace('→', '').trim();
-    document.querySelector('#dialog-description').textContent = 'You’re viewing the AllWeb3 preview. This link is not connected yet.';
-    dialog.showModal();
-  });
-});
-document.querySelectorAll('.dialog-close, .dialog-dismiss').forEach(button => button.addEventListener('click', () => dialog.close()));
-dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
-
-['dark', 'light'].forEach(cardTheme => {
-  Object.values(content).flatMap(data => data.steps).forEach(stepData => {
-    const image = new Image(); image.src = `assets/how-${cardTheme}-${stepData[3]}.png`;
-  });
-});
-render();
